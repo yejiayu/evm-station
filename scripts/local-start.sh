@@ -23,7 +23,7 @@ GENESIS=$HOMEDIR/config/genesis.json
 TMP_GENESIS=$HOMEDIR/config/tmp_genesis.json
 	VAL_KEY="mykey"
 
-./build/station-evm start \
+station-evm start \
 	--metrics "$TRACE" \
 	--log_level $LOGLEVEL \
 	--json-rpc.api eth,txpool,personal,net,debug,web3 \

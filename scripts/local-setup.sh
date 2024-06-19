@@ -31,10 +31,6 @@ command -v jq >/dev/null 2>&1 || {
 # used to exit on first error (any non-zero exit code)
 set -e
 
-# Parse input flags
-install=true
-overwrite=""
-
 while [[ $# -gt 0 ]]; do
 	key="$1"
 	case $key in
@@ -60,11 +56,6 @@ while [[ $# -gt 0 ]]; do
 	esac
 done
 
-if [[ $install == true ]]; then
-	# (Re-)install daemon
-	go build -o ./build/station-evm ./cmd/station-evmd/main.go
-fi
-
 # User prompt if neither -y nor -n was passed as a flag
 # and an existing local node configuration is found.
 if [[ $overwrite = "" ]]; then
@@ -77,16 +68,10 @@ if [[ $overwrite = "" ]]; then
 	fi
 fi
 
-# Setup local node if overwrite is set to Yes, otherwise skip setup
-if [[ $overwrite == "y" || $overwrite == "Y" ]]; then
-	# Remove the previous folder
-	rm -rf "$HOMEDIR"
-
-	echo "$VAL_MNEMONIC" | ./build/station-evm keys add "$VAL_KEY"  --keyring-backend "$KEYRING" --algo "$KEYALGO" --home "$HOMEDIR"
-
 echo "$HOMEDIR"
+	echo "$VAL_MNEMONIC" | station-evm keys add "$VAL_KEY"  --keyring-backend "$KEYRING" --algo "$KEYALGO" --home "$HOMEDIR"
 	# Set moniker and chain-id for Evmos (Moniker can be anything, chain-id must be an integer)
-	./build/station-evm init $MONIKER -o --chain-id "$CHAINID" --home "$HOMEDIR"
+	station-evm init $MONIKER -o --chain-id "$CHAINID" --home "$HOMEDIR"
 	# Change parameter token denominations to aevmos
 	jq '.app_state["staking"]["params"]["bond_denom"]="aevmos"' "$GENESIS" >"$TMP_GENESIS" && mv "$TMP_GENESIS" "$GENESIS"
 	jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="aevmos"' "$GENESIS" >"$TMP_GENESIS" && mv "$TMP_GENESIS" "$GENESIS"
@@ -97,14 +82,14 @@ echo "$HOMEDIR"
 	jq '.app_state["feemarket"]["params"]["base_fee"]="'${BASEFEE}'"' "$GENESIS" >"$TMP_GENESIS" && mv "$TMP_GENESIS" "$GENESIS"
 
 #	# Allocate genesis accounts (cosmos formatted addresses)
-	./build/station-evm add-genesis-account "$(./build/station-evm keys show "$VAL_KEY" -a --keyring-backend "$KEYRING" --home "$HOMEDIR")" 100000000000000000000000000aevmos --keyring-backend "$KEYRING" --home "$HOMEDIR"
+	station-evm add-genesis-account "$(./build/station-evm keys show "$VAL_KEY" -a --keyring-backend "$KEYRING" --home "$HOMEDIR")" 100000000000000000000000000aevmos --keyring-backend "$KEYRING" --home "$HOMEDIR"
 
 
 	# Sign genesis transaction
-	./build/station-evm gentx "$VAL_KEY" 1000000000000000000000aevmos --gas-prices ${BASEFEE}aevmos --keyring-backend "$KEYRING" --chain-id "$CHAINID" --home "$HOMEDIR"
+	station-evm gentx "$VAL_KEY" 1000000000000000000000aevmos --gas-prices ${BASEFEE}aevmos --keyring-backend "$KEYRING" --chain-id "$CHAINID" --home "$HOMEDIR"
 
 	# Collect genesis tx
-	./build/station-evm collect-gentxs --home "$HOMEDIR"
+	station-evm collect-gentxs --home "$HOMEDIR"
 
 fi
 
