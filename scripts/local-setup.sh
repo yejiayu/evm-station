@@ -56,18 +56,6 @@ while [[ $# -gt 0 ]]; do
 	esac
 done
 
-# User prompt if neither -y nor -n was passed as a flag
-# and an existing local node configuration is found.
-if [[ $overwrite = "" ]]; then
-	if [ -d "$HOMEDIR" ]; then
-		printf "\nAn existing folder at '%s' was found. You can choose to delete this folder and start a new local node with new keys from genesis. When declined, the existing local node is started. \n" "$HOMEDIR"
-		echo "Overwrite the existing configuration and start a new local node? [y/n]"
-		read -r overwrite
-	else
-		overwrite="y"
-	fi
-fi
-
 echo "$HOMEDIR"
 	station-evm keys add "$VAL_KEY"  --keyring-backend "$KEYRING" --algo "$KEYALGO" --home "$HOMEDIR"
 	# Set moniker and chain-id for Evmos (Moniker can be anything, chain-id must be an integer)
@@ -83,7 +71,6 @@ echo "$HOMEDIR"
 
 #	# Allocate genesis accounts (cosmos formatted addresses)
 	station-evm add-genesis-account "$(./build/station-evm keys show "$VAL_KEY" -a --keyring-backend "$KEYRING" --home "$HOMEDIR")" 100000000000000000000000000aevmos --keyring-backend "$KEYRING" --home "$HOMEDIR"
-
 
 	# Sign genesis transaction
 	station-evm gentx "$VAL_KEY" 1000000000000000000000aevmos --gas-prices ${BASEFEE}aevmos --keyring-backend "$KEYRING" --chain-id "$CHAINID" --home "$HOMEDIR"
