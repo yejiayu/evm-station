@@ -69,9 +69,9 @@ if [[ $overwrite = "" ]]; then
 fi
 
 echo "$HOMEDIR"
-	echo "$VAL_MNEMONIC" | station-evm keys add "$VAL_KEY"  --keyring-backend "$KEYRING" --algo "$KEYALGO" --home "$HOMEDIR"
+	station-evm keys add "$VAL_KEY"  --keyring-backend "$KEYRING" --algo "$KEYALGO" --home "$HOMEDIR"
 	# Set moniker and chain-id for Evmos (Moniker can be anything, chain-id must be an integer)
-	station-evm init $MONIKER -o --chain-id "$CHAINID" --home "$HOMEDIR" -y
+	station-evm init $MONIKER -o --chain-id "$CHAINID" --home "$HOMEDIR"
 	# Change parameter token denominations to aevmos
 	jq '.app_state["staking"]["params"]["bond_denom"]="aevmos"' "$GENESIS" >"$TMP_GENESIS" && mv "$TMP_GENESIS" "$GENESIS"
 	jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="aevmos"' "$GENESIS" >"$TMP_GENESIS" && mv "$TMP_GENESIS" "$GENESIS"
