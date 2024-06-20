@@ -27,6 +27,7 @@ station-evm start \
 	--metrics "$TRACE" \
 	--log_level $LOGLEVEL \
 	--json-rpc.api eth,txpool,personal,net,debug,web3 \
-	--chain-id "$CHAINID"
+	--chain-id "$CHAINID" \
+	--json-rpc.address "0.0.0.0:8545"
 
 
