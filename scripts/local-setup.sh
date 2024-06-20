@@ -78,5 +78,3 @@ echo "$HOMEDIR"
 	# Collect genesis tx
 	station-evm collect-gentxs --home "$HOMEDIR"
 
-fi
-
